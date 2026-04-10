@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}BrewIQ{% endblock %} | BrewIQ Cafe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .form-input {
+      @apply w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
+             focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent;
+    }
+    .btn-primary {
+      @apply bg-amber-500 hover:bg-amber-600 text-white font-semibold
+             px-4 py-2 rounded-lg transition-colors duration-150;
+    }
+    .btn-secondary {
+      @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold
+             px-4 py-2 rounded-lg transition-colors duration-150;
+    }
+    .btn-danger {
+      @apply bg-red-500 hover:bg-red-600 text-white font-semibold
+             px-4 py-2 rounded-lg transition-colors duration-150;
+    }
+    .card {
+      @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+    }
+    .badge-yellow  { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800; }
+    .badge-blue    { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800; }
+    .badge-orange  { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800; }
+    .badge-green   { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800; }
+    .badge-gray    { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600; }
+    .badge-red     { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+{% if user.is_authenticated %}
+<!-- Sidebar -->
+<div class="flex h-screen overflow-hidden">
+  <aside class="w-64 bg-gray-900 text-white flex flex-col flex-shrink-0">
+    <!-- Logo -->
+    <div class="px-6 py-5 border-b border-gray-700">
+      <h1 class="text-xl font-bold text-amber-400">☕ BrewIQ</h1>
+      <p class="text-xs text-gray-400 mt-0.5">Cafe Intelligence System</p>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <a href="{% url 'orders:dashboard' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors
+                {% if request.resolver_match.app_name == 'orders' and 'dashboard' in request.path %}bg-gray-800{% endif %}">
+        <span class="text-lg">🏠</span> Dashboard
+      </a>
+      <a href="{% url 'orders:order_create' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">➕</span> New Order
+      </a>
+      <a href="{% url 'orders:order_list' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">📋</span> All Orders
+      </a>
+      <a href="{% url 'orders:kds' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">👨‍🍳</span> Kitchen Display
+      </a>
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Management</p>
+      </div>
+      <a href="{% url 'menu:menu_list' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">🍽️</span> Menu
+      </a>
+      <a href="{% url 'inventory:dashboard' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">📦</span> Inventory
+      </a>
+      <a href="{% url 'billing:bill_list' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">🧾</span> Billing
+      </a>
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Intelligence</p>
+      </div>
+      <a href="{% url 'intelligence:dashboard' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-amber-800/40 text-amber-300 transition-colors">
+        <span class="text-lg">🧠</span> BrewIQ Engine
+      </a>
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin</p>
+      </div>
+      <a href="{% url 'accounts:staff_list' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">👥</span> Staff
+      </a>
+      <a href="{% url 'orders:table_list' %}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+        <span class="text-lg">🪑</span> Tables
+      </a>
+    </nav>
+
+    <!-- User footer -->
+    <div class="px-4 py-4 border-t border-gray-700">
+      <p class="text-xs text-gray-400">Signed in as</p>
+      <p class="text-sm font-semibold text-white truncate">{{ user.get_full_name|default:user.username }}</p>
+      {% if user.profile %}
+        <p class="text-xs text-amber-400">{{ user.profile.get_role_display }}</p>
+      {% endif %}
+      <a href="{% url 'accounts:logout' %}"
+         class="mt-2 block text-xs text-gray-500 hover:text-red-400 transition-colors">Sign out →</a>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 overflow-y-auto">
+    <!-- Top bar -->
+    <div class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+      <h2 class="text-lg font-semibold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h2>
+      <div class="flex items-center gap-4">
+        {% block top_actions %}{% endblock %}
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% if messages %}
+    <div class="px-8 pt-4">
+      {% for message in messages %}
+      <div class="mb-2 px-4 py-3 rounded-lg text-sm font-medium
+        {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
+        {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200
+        {% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200
+        {% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page content -->
+    <div class="px-8 py-6">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

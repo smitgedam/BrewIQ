@@ -1,0 +1,15 @@
+Django==4.2.16
+django-htmx==1.19.0
+django-crispy-forms==2.3
+crispy-tailwind==1.0.3
+Pillow==10.4.0
+pandas==2.2.3
+numpy==1.26.4
+python-decouple==3.8
+dj-database-url==2.2.0
+psycopg2-binary==2.9.9
+WeasyPrint==62.3
+qrcode==7.4.2
+whitenoise==6.7.0
+django-debug-toolbar==4.4.2
+gunicorn==23.0.0

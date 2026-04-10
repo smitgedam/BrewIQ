@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Bill #{{ bill.pk }}{% endblock %}
+{% block page_title %}Bill #{{ bill.pk }}{% endblock %}
+{% block top_actions %}
+  <a href="{% url 'billing:bill_print' bill.pk %}" target="_blank" class="btn-secondary text-sm">🖨️ Print</a>
+  <a href="{% url 'billing:bill_list' %}" class="btn-secondary text-sm">← Bills</a>
+{% endblock %}
+{% block content %}
+<div class="max-w-lg">
+  <div class="card">
+    <!-- Header -->
+    <div class="text-center border-b border-gray-100 pb-4 mb-4">
+      <h2 class="text-xl font-bold text-gray-900">☕ BrewIQ Cafe</h2>
+      <p class="text-xs text-gray-400 mt-1">Tax Invoice</p>
+    </div>
+
+    <!-- Order info -->
+    <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+      <div>
+        <p class="text-gray-500">Bill #</p>
+        <p class="font-semibold text-gray-900">{{ bill.pk }}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Order #</p>
+        <p class="font-semibold text-gray-900">{{ bill.order.pk }}</p>
+      </div>
+      {% if bill.order.customer_name %}
+      <div class="col-span-2">
+        <p class="text-gray-500">Customer</p>
+        <p class="font-semibold text-gray-900">{{ bill.order.customer_name }}</p>
+      </div>
+      {% endif %}
+      <div>
+        <p class="text-gray-500">Date</p>
+        <p class="font-semibold text-gray-900">{{ bill.generated_at|date:"d M Y, H:i" }}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Table / Type</p>
+        <p class="font-semibold text-gray-900">
+          {% if bill.order.table %}Table {{ bill.order.table.number }}{% else %}Takeaway{% endif %}
+        </p>
+      </div>
+      <div>
+        <p class="text-gray-500">Payment</p>
+        <p class="font-semibold text-gray-900">{{ bill.payment_mode }}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Status</p>
+        <p class="font-semibold {% if bill.is_paid %}text-green-600{% else %}text-red-600{% endif %}">
+          {% if bill.is_paid %}Paid ✓{% else %}Unpaid{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <table class="w-full text-sm mb-4 border-t border-gray-100 pt-4">
+      <thead>
+        <tr class="border-b border-gray-100">
+          <th class="text-left py-2 font-semibold text-gray-600">Item</th>
+          <th class="text-center py-2 font-semibold text-gray-600">Qty</th>
+          <th class="text-right py-2 font-semibold text-gray-600">Rate</th>
+          <th class="text-right py-2 font-semibold text-gray-600">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in bill.order.items.all %}
+        <tr class="border-b border-gray-50">
+          <td class="py-2 text-gray-900">{{ item.menu_item.name }}</td>
+          <td class="py-2 text-center text-gray-600">{{ item.quantity }}</td>
+          <td class="py-2 text-right text-gray-600">₹{{ item.unit_price }}</td>
+          <td class="py-2 text-right font-medium text-gray-900">₹{{ item.subtotal }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="pt-3 text-right text-gray-600">Subtotal</td>
+          <td class="pt-3 text-right text-gray-900">₹{{ bill.subtotal }}</td>
+        </tr>
+        <tr>
+          <td colspan="3" class="py-1 text-right text-gray-600">GST ({{ bill.gst_rate }}%)</td>
+          <td class="py-1 text-right text-gray-900">₹{{ bill.gst_amount }}</td>
+        </tr>
+        <tr class="border-t-2 border-gray-200">
+          <td colspan="3" class="pt-3 text-right font-bold text-gray-900 text-base">Total</td>
+          <td class="pt-3 text-right font-bold text-amber-600 text-xl">₹{{ bill.total_amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <p class="text-center text-xs text-gray-400 mt-4">Thank you for visiting BrewIQ! 🙏</p>
+  </div>
+</div>
+{% endblock %}

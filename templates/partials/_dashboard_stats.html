@@ -1,0 +1,16 @@
+<div class="card text-center">
+  <p class="text-3xl font-bold text-amber-500">{{ stats.total_orders_today }}</p>
+  <p class="text-sm text-gray-500 mt-1">Orders Today</p>
+</div>
+<div class="card text-center">
+  <p class="text-3xl font-bold text-green-600">₹{{ stats.revenue_today|floatformat:0 }}</p>
+  <p class="text-sm text-gray-500 mt-1">Revenue Today</p>
+</div>
+<div class="card text-center">
+  <p class="text-3xl font-bold text-blue-600">{{ stats.active_orders }}</p>
+  <p class="text-sm text-gray-500 mt-1">Active Orders</p>
+</div>
+<div class="card text-center">
+  <p class="text-3xl font-bold text-orange-500">{{ stats.occupied_tables }}</p>
+  <p class="text-sm text-gray-500 mt-1">Tables Occupied</p>
+</div>

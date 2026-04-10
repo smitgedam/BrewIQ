@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block page_title %}
+  Order #{{ order.pk }}
+  <span class="inline-flex items-center gap-1.5 text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 ml-3 align-middle">
+    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Live
+  </span>
+{% endblock %}
+{% block top_actions %}
+  <a href="{% url 'orders:order_list' %}" class="btn-secondary text-sm">← All Orders</a>
+{% endblock %}
+{% block content %}
+
+<!--
+  The entire detail panel is one live-polling container.
+  Every 6 seconds it fetches the partial view which re-renders
+  the status badge, action buttons, and billing section
+  reflecting whoever changed the order on any other screen.
+-->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+     id="order-detail-live"
+     hx-get="{% url 'orders:partial_order_detail' order.pk %}"
+     hx-trigger="every 6s"
+     hx-swap="innerHTML">
+  {% include 'partials/_order_detail_live.html' %}
+</div>
+
+{% endblock %}

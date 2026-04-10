@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block page_title %}
+  Inventory
+  <span class="inline-flex items-center gap-1.5 text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 ml-3 align-middle">
+    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Live
+  </span>
+{% endblock %}
+{% block top_actions %}
+  <a href="{% url 'inventory:ingredient_create' %}" class="btn-primary text-sm">+ Ingredient</a>
+  <a href="{% url 'inventory:movement_create' %}" class="btn-secondary text-sm">Stock Movement</a>
+  <a href="{% url 'inventory:link_ingredient' %}" class="btn-secondary text-sm">Link to Menu</a>
+{% endblock %}
+{% block content %}
+
+<!--
+  The entire inventory content polls every 20 seconds.
+  When a completed order auto-deducts stock via signals,
+  every user on this page sees updated levels within 20 seconds.
+-->
+<div id="inventory-live"
+     hx-get="{% url 'inventory:partial_levels' %}"
+     hx-trigger="every 20s"
+     hx-swap="innerHTML">
+  {% include 'partials/_inventory_levels.html' %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% if active_orders %}
+  <div class="space-y-3">
+    {% for order in active_orders %}
+    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-gray-900">#{{ order.pk }}</span>
+          <span class="badge-{{ order.status_color }}">{{ order.get_status_display }}</span>
+          <span class="text-xs text-gray-500">{{ order.get_order_type_display }}</span>
+        </div>
+        <p class="text-sm text-gray-600 mt-0.5">
+          {% if order.table %}Table {{ order.table.number }}{% else %}Takeaway{% endif %}
+          · {{ order.item_count }} item(s)
+          · ₹{{ order.total_amount|floatformat:2 }}
+        </p>
+        <p class="text-xs text-gray-400">{{ order.created_at|timesince }} ago</p>
+      </div>
+      <a href="{% url 'orders:order_detail' order.pk %}" class="btn-secondary text-xs">View →</a>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-12 text-gray-400">
+    <div class="text-4xl mb-2">🎉</div>
+    <p class="text-sm">No active orders right now.</p>
+  </div>
+{% endif %}

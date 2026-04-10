@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Menu{% endblock %}
+{% block page_title %}Menu Management{% endblock %}
+{% block top_actions %}
+  <a href="{% url 'menu:item_create' %}" class="btn-primary text-sm">+ Add Item</a>
+  <a href="{% url 'menu:category_create' %}" class="btn-secondary text-sm">+ Category</a>
+{% endblock %}
+{% block content %}
+{% for cat in categories %}
+<div class="mb-6">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-base font-bold text-gray-800">{{ cat.name }}</h3>
+    <a href="{% url 'menu:category_update' cat.pk %}" class="text-xs text-gray-400 hover:text-amber-600">Edit category</a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    {% for item in cat.items.all %}
+    <div class="bg-white rounded-xl border border-gray-200 p-4 flex justify-between items-start">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+          <h4 class="font-semibold text-gray-900 text-sm truncate">{{ item.name }}</h4>
+          {% if item.is_vegetarian %}<span class="text-green-500 text-xs">🌿</span>{% endif %}
+          {% if not item.is_available %}<span class="badge-red text-xs">Unavailable</span>{% endif %}
+        </div>
+        <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ item.description|default:"—" }}</p>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-bold text-amber-600">₹{{ item.current_price }}</span>
+          {% if item.base_price != item.current_price %}
+            <span class="text-xs text-gray-400 line-through">₹{{ item.base_price }}</span>
+          {% endif %}
+          <span class="text-xs text-gray-400">~{{ item.prep_time_minutes }}min</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1 ml-3 flex-shrink-0">
+        <a href="{% url 'menu:item_update' item.pk %}" class="text-xs text-amber-600 hover:text-amber-800 font-medium">Edit</a>
+        <a href="{% url 'menu:item_toggle' item.pk %}"
+           class="text-xs {% if item.is_available %}text-gray-400 hover:text-red-500{% else %}text-green-500 hover:text-green-700{% endif %} font-medium">
+          {% if item.is_available %}Hide{% else %}Show{% endif %}
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-3 text-sm text-gray-400 bg-gray-50 rounded-xl p-4 text-center">No items in this category.</div>
+    {% endfor %}
+  </div>
+</div>
+{% empty %}
+<div class="text-center py-16 text-gray-400">
+  <p class="text-4xl mb-3">🍽️</p>
+  <p>No menu categories yet. <a href="{% url 'menu:category_create' %}" class="text-amber-600 hover:underline">Add one →</a></p>
+</div>
+{% endfor %}
+{% endblock %}

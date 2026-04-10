@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Orders{% endblock %}
+{% block page_title %}
+  All Orders
+  <span class="inline-flex items-center gap-1.5 text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 ml-3 align-middle">
+    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Live
+  </span>
+{% endblock %}
+{% block top_actions %}
+  <a href="{% url 'orders:order_create' %}" class="btn-primary text-sm">+ New Order</a>
+{% endblock %}
+{% block content %}
+
+<!-- Filter bar -->
+<div class="flex gap-2 mb-4 flex-wrap" id="filter-bar">
+  <a href="{% url 'orders:order_list' %}"
+     class="px-4 py-2 rounded-full text-sm {% if not status_filter %}bg-amber-500 text-white{% else %}bg-white border border-gray-200 text-gray-700 hover:border-amber-400{% endif %}">
+    All
+  </a>
+  {% for value, label in statuses %}
+  <a href="?status={{ value }}"
+     class="px-4 py-2 rounded-full text-sm {% if status_filter == value %}bg-amber-500 text-white{% else %}bg-white border border-gray-200 text-gray-700 hover:border-amber-400{% endif %}">
+    {{ label }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-gray-100">
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">#</th>
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">Type</th>
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">Table</th>
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">Status</th>
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">Items</th>
+        <th class="text-right py-3 px-3 font-semibold text-gray-600">Total</th>
+        <th class="text-left py-3 px-3 font-semibold text-gray-600">Created</th>
+        <th class="py-3 px-3"></th>
+      </tr>
+    </thead>
+    <!-- tbody polls every 10s — only the rows are swapped, header stays -->
+    <tbody id="order-list-body"
+           hx-get="{% url 'orders:partial_order_list' %}{% if status_filter %}?status={{ status_filter }}{% endif %}"
+           hx-trigger="every 10s"
+           hx-swap="innerHTML">
+      {% include 'partials/_order_list_rows.html' %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

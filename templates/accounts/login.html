@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block auth_content %}
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-3">☕</div>
+      <h1 class="text-2xl font-bold text-gray-900">BrewIQ</h1>
+      <p class="text-sm text-gray-500 mt-1">Cafe Intelligence System</p>
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        {{ form.username }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        {{ form.password }}
+      </div>
+      {% if form.non_field_errors %}
+        <p class="text-sm text-red-600">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+      <button type="submit" class="w-full btn-primary py-3 text-base">Sign In →</button>
+    </form>
+    <p class="text-center text-xs text-gray-400 mt-6">BrewIQ v1.0 — MCA Project</p>
+  </div>
+</div>
+{% endblock %}

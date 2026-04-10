@@ -1,0 +1,53 @@
+{% if orders %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  {% for order in orders %}
+  <div class="bg-white rounded-xl border-2 {% if order.status == 'PREPARING' %}border-orange-400{% else %}border-blue-300{% endif %} shadow-sm p-4">
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <span class="text-lg font-bold text-gray-900">#{{ order.pk }}</span>
+        {% if order.table %}<span class="ml-2 text-sm text-gray-500">Table {{ order.table.number }}</span>{% else %}<span class="ml-2 text-sm text-gray-500">Takeaway</span>{% endif %}
+      </div>
+      <span class="badge-{% if order.status == 'PREPARING' %}orange{% else %}blue{% endif %} text-xs">{{ order.get_status_display }}</span>
+    </div>
+    <p class="text-xs text-gray-400 mb-3">{{ order.created_at|timesince }} ago</p>
+    <ul class="space-y-1 mb-4">
+      {% for item in order.items.all %}
+      <li class="flex gap-2 text-sm">
+        <span class="font-bold text-amber-600 w-6 text-right flex-shrink-0">{{ item.quantity }}×</span>
+        <span class="text-gray-800">{{ item.menu_item.name }}</span>
+        {% if item.notes %}<span class="text-xs text-gray-400 italic">({{ item.notes }})</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% if order.notes %}
+      <p class="text-xs text-yellow-700 bg-yellow-50 rounded p-2 mb-3">📝 {{ order.notes }}</p>
+    {% endif %}
+    <div class="flex gap-2">
+      {% if order.status == 'CONFIRMED' %}
+      <form method="post" action="{% url 'orders:order_status_update' order.pk %}" class="flex-1">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="PREPARING">
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
+          Start Preparing
+        </button>
+      </form>
+      {% elif order.status == 'PREPARING' %}
+      <form method="post" action="{% url 'orders:order_status_update' order.pk %}" class="flex-1">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="READY">
+        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
+          ✓ Mark Ready
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-20 text-gray-400">
+  <div class="text-6xl mb-4">✅</div>
+  <p class="text-lg font-medium">All caught up!</p>
+  <p class="text-sm mt-1">No pending orders in the kitchen.</p>
+</div>
+{% endif %}

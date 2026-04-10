@@ -1,0 +1,62 @@
+{% if low_stock %}
+<div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+  <h3 class="font-semibold text-red-800 mb-2">⚠️ Low Stock Alert ({{ low_stock|length }} item{{ low_stock|length|pluralize }})</h3>
+  <div class="flex flex-wrap gap-2">
+    {% for item in low_stock %}
+    <span class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full">
+      {{ item.name }}: {{ item.current_stock }} {{ item.unit }}
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div>
+    <h3 class="font-semibold text-gray-800 mb-4">Ingredients</h3>
+    <div class="space-y-2">
+      {% for ing in ingredients %}
+      <div class="flex items-center justify-between p-3 rounded-lg
+        {% if ing.stock_status == 'out' %}bg-red-50{% elif ing.stock_status == 'low' %}bg-yellow-50{% else %}bg-gray-50{% endif %}">
+        <div>
+          <p class="text-sm font-semibold text-gray-900">{{ ing.name }}</p>
+          <p class="text-xs text-gray-500">{{ ing.current_stock }} {{ ing.unit }} · threshold: {{ ing.low_stock_threshold }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-bold
+            {% if ing.stock_status == 'out' %}text-red-600
+            {% elif ing.stock_status == 'low' %}text-yellow-600
+            {% else %}text-green-600{% endif %}">
+            {% if ing.stock_status == 'out' %}OUT{% elif ing.stock_status == 'low' %}LOW{% else %}OK{% endif %}
+          </span>
+          <a href="{% url 'inventory:ingredient_update' ing.pk %}" class="text-xs text-amber-600 hover:text-amber-800">Edit</a>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-sm text-gray-400 text-center py-6">No ingredients yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div>
+    <h3 class="font-semibold text-gray-800 mb-4">Recent Stock Movements</h3>
+    <div class="space-y-2">
+      {% for mv in recent_movements %}
+      <div class="flex items-center justify-between text-sm py-2 border-b border-gray-50">
+        <div>
+          <span class="font-medium text-gray-900">{{ mv.ingredient.name }}</span>
+          <span class="text-xs text-gray-400 ml-2">{{ mv.created_at|date:"d M, H:i" }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="{% if mv.movement_type == 'IN' %}text-green-600{% elif mv.movement_type == 'OUT' %}text-blue-600{% elif mv.movement_type == 'WASTE' %}text-red-600{% else %}text-gray-600{% endif %} text-xs font-semibold">
+            {{ mv.get_movement_type_display }}
+          </span>
+          <span class="text-gray-700 font-mono text-xs">{{ mv.quantity }} {{ mv.ingredient.unit }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-sm text-gray-400 text-center py-6">No movements recorded.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>

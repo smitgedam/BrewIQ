@@ -1,0 +1,23 @@
+{% for bill in bills %}
+<tr class="border-b border-gray-50 hover:bg-gray-50">
+  <td class="py-3 px-3 font-bold text-gray-900">#{{ bill.pk }}</td>
+  <td class="py-3 px-3 text-gray-600">#{{ bill.order.pk }}</td>
+  <td class="py-3 px-3 text-gray-700">₹{{ bill.subtotal }}</td>
+  <td class="py-3 px-3 text-gray-500">₹{{ bill.gst_amount }}</td>
+  <td class="py-3 px-3 font-semibold text-amber-600">₹{{ bill.total_amount }}</td>
+  <td class="py-3 px-3 text-gray-600">{{ bill.payment_mode }}</td>
+  <td class="py-3 px-3">
+    {% if bill.is_paid %}
+      <span class="badge-green">Paid</span>
+    {% else %}
+      <span class="badge-red">Unpaid</span>
+    {% endif %}
+  </td>
+  <td class="py-3 px-3 text-gray-500 text-xs">{{ bill.generated_at|date:"d M Y, H:i" }}</td>
+  <td class="py-3 px-3 text-right">
+    <a href="{% url 'billing:bill_detail' bill.pk %}" class="text-amber-600 hover:text-amber-800 font-medium text-xs">View</a>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="9" class="py-8 text-center text-gray-400">No bills yet.</td></tr>
+{% endfor %}
